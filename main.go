@@ -6,13 +6,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	response "example.com/mod/core"
+	"example.com/mod/middleware"
 	"example.com/mod/utils"
 )
 
@@ -40,6 +44,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	redisClient := redis.NewClient(&redis.Options{
+		DB:       0,
+		Addr:     "127.0.0.1:6379",
+		Password: "Password",
+	})
+
 	fmt.Println(*env, "env---")
 
 	database := client.Database("blog")
@@ -65,7 +75,9 @@ func main() {
 
 	r.POST("/login", func(c *gin.Context) {
 
-		token, _ := utils.GenerateJwtToken("secret", "issuer", "audience", 60, 1, "admin", 1)
+		token, _ := utils.GenerateJwtToken("secret", "issuer", "audience", int64(time.Hour)*24, 1, "admin", 1)
+
+		redisClient.Set(context.Background(), "ADMIN_TOKEN_"+strings.ToUpper(utils.Md5(token)), token, 7*time.Hour*24)
 
 		response.OkWithData(gin.H{
 			"token": token,
@@ -118,6 +130,11 @@ func main() {
 		// c.JSON(http.StatusOK, gin.H{
 		// 	"message": json,
 		// })
+	})
+
+	r.Use(middleware.Auth())
+	r.POST("/test", func(c *gin.Context) {
+		response.Ok(c)
 	})
 
 	r.Run(":8080")

@@ -13,8 +13,9 @@ type Response struct {
 }
 
 const (
-	ERROR   = 400
-	SUCCESS = http.StatusOK
+	ERROR    = 400
+	NOT_AUTH = 401
+	SUCCESS  = http.StatusOK
 )
 
 func Result(code int, data interface{}, msg string, c *gin.Context) {
@@ -51,4 +52,8 @@ func FailWithMessage(message string, c *gin.Context) {
 
 func FailWithDetailed(data interface{}, message string, c *gin.Context) {
 	Result(ERROR, data, message, c)
+}
+
+func FailWithAuth(message string, c *gin.Context) {
+	Result(NOT_AUTH, nil, message, c)
 }
