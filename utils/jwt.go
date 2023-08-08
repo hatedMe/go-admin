@@ -9,7 +9,7 @@ import (
 
 // 自定义格式内容
 type CustomerClaims struct {
-	UserId         int    `json:"userId"`
+	UserId         string `json:"userId"`
 	UserName       string `json:"userName"`
 	RoleId         int    `json:"roleId"`
 	StandardClaims jwt.StandardClaims
@@ -20,7 +20,7 @@ func (c CustomerClaims) Valid() error {
 }
 
 // 生成token
-func GenerateJwtToken(secret string, issuer string, audience string, expiredMinutes int64, userId int, userName string, roleId int) (string, error) {
+func GenerateJwtToken(secret string, issuer string, audience string, expiredMinutes int64, userId string, userName string, roleId int) (string, error) {
 	hmacSampleSecret := []byte(secret) //密钥，不能泄露
 	token := jwt.New(jwt.SigningMethodHS256)
 	nowTime := time.Now().Unix()

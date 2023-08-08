@@ -18,13 +18,17 @@ func Auth() gin.HandlerFunc {
 		}
 
 		claims, err := utils.ParseJwtToken(token, "secret")
+
 		if err != nil {
 			response.FailWithAuth("token 不合法", c)
 			c.Abort()
+			return
 		}
 
 		if time.Now().Unix() > claims.StandardClaims.ExpiresAt {
 			response.FailWithAuth("token 已过期", c)
+			c.Abort()
+			return
 		}
 
 		c.Next()

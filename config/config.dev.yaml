@@ -1,0 +1,17 @@
+jwt:
+  signing-key: secret
+  expires-time: 7d
+  buffer-time: 1d
+  issuer: secret
+
+redis:
+  db: 0
+  addr: "127.0.0.1:6379"
+  password: "password"
+
+mongodb:
+  host: "127.0.0.1:6379"
+  port : "27017"
+  dbname: "blog"
+  username: "username"
+  password: "password"
